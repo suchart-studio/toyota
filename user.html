@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียนเข้าตรวจเช็ค - Toyota</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { font-family: 'Kanit', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="w-full max-w-md min-h-screen bg-white shadow-xl flex flex-col p-6 border-t-8 border-emerald-500">
+        <div class="flex items-center justify-between mb-6">
+            <a href="index.html" class="text-gray-600 text-xl"><i class="fa-solid fa-arrow-left"></i></a>
+            <h1 class="text-2xl font-bold text-emerald-700">ลงทะเบียนตรวจเช็ครถ</h1>
+            <div></div>
+        </div>
+
+        <form id="regForm" class="space-y-4 flex-1 pb-8">
+            <div>
+                <label class="block text-gray-700 font-medium mb-1 text-lg">ภาพถ่ายหน้าตรงลูกค้า</label>
+                <div class="flex flex-col items-center bg-gray-50 p-3 rounded-xl border-2 border-dashed border-gray-300">
+                    <video id="video" class="w-full max-h-48 rounded-lg bg-black hidden" autoplay playsinline></video>
+                    <canvas id="canvas" class="w-full max-h-48 rounded-lg bg-black hidden"></canvas>
+                    <img id="photoPreview" class="w-32 h-32 object-cover rounded-full border-4 border-emerald-500 hidden" src="" alt="Preview">
+                    
+                    <div class="mt-3 flex gap-2">
+                        <button type="button" id="startCam" class="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold"><i class="fa-solid fa-camera mr-1"></i> เปิดกล้อง</button>
+                        <button type="button" id="captureCam" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hidden"><i class="fa-solid fa-circle-dot mr-1"></i> ถ่ายรูป</button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium text-lg">ชื่อ - นามสกุล</label>
+                <input type="text" id="fullname" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium text-lg">เบอร์โทรศัพท์</label>
+                <input type="tel" id="phone" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-gray-700 font-medium text-lg">รุ่นรถยนต์</label>
+                    <input type="text" id="carModel" placeholder="เช่น Yaris, Hilux" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium text-lg">สีรถ</label>
+                    <input type="text" id="carColor" placeholder="เช่น ขาว, ดำ" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium text-lg">หมายเลขทะเบียนรถ (ไม่ต้องมีช่องว่าง)</label>
+                <input type="text" id="licensePlate" placeholder="กข1234กรุงเทพ" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg font-bold text-gray-800 uppercase focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium text-lg">วันที่เข้ารับบริการ</label>
+                <input type="date" id="serviceDate" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <button type="submit" id="btnSubmit" class="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl text-xl shadow-lg hover:bg-emerald-600 transition">
+                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> บันทึกข้อมูลลงทะเบียน
+            </button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+        import { getStorage, ref as sRef, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMptdLpLEdbeVFKZj82M0gyoV2m_2y5Pk",
+            authDomain: "suchartstudio-9a78d.firebaseapp.com",
+            databaseURL: "https://suchartstudio-9a78d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "suchartstudio-9a78d",
+            storageBucket: "suchartstudio-9a78d.firebasestorage.app",
+            messagingSenderId: "953369646185",
+            appId: "1:953369646185:web:6c5994b4563695956ebef8",
+            measurementId: "G-0KV9KLSKVW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+
+        // จัดการกล้องถ่ายรูป
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photoPreview = document.getElementById('photoPreview');
+        const startCamBtn = document.getElementById('startCam');
+        const captureCamBtn = document.getElementById('captureCam');
+        let imgDataUrl = "";
+
+        startCamBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                captureCamBtn.classList.remove('hidden');
+                startCamBtn.classList.add('hidden');
+                photoPreview.classList.add('hidden');
+            } catch (err) {
+                alert("ไม่สามารถเข้าถึงกล้องได้: " + err);
+            }
+        });
+
+        captureCamBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            imgDataUrl = canvas.toDataURL('image/jpeg');
+            
+            photoPreview.src = imgDataUrl;
+            photoPreview.classList.remove('hidden');
+            video.classList.add('hidden');
+            captureCamBtn.classList.add('hidden');
+            startCamBtn.classList.remove('hidden');
+            
+            // ปิดสตรีมกล้อง
+            const stream = video.srcObject;
+            if (stream) stream.getTracks().forEach(track => track.stop());
+        });
+
+        // ส่งฟอร์มข้อมูลลงทะเบียน
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btnSubmit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "กำลังบันทึกข้อมูล...";
+
+            try {
+                let photoUrl = "https://placehold.co/150x150/emerald/ffffff?text=No+Photo";
+                
+                if (imgDataUrl) {
+                    const storageRef = sRef(storage, 'customer_photos/' + Date.now() + '.jpg');
+                    await uploadString(storageRef, imgDataUrl, 'data_url');
+                    photoUrl = await getDownloadURL(storageRef);
+                }
+
+                const newRef = push(ref(db, 'registrations'));
+                await set(newRef, {
+                    fullname: document.getElementById('fullname').value,
+                    phone: document.getElementById('phone').value,
+                    carModel: document.getElementById('carModel').value,
+                    carColor: document.getElementById('carColor').value,
+                    licensePlate: document.getElementById('licensePlate').value.replace(/\s+/g, ''),
+                    serviceDate: document.getElementById('serviceDate').value,
+                    timestamp: Date.now()
+                });
+
+                alert("ลงทะเบียนสำเร็จเรียบร้อย!");
+                window.location.href = "index.html";
+            } catch (error) {
+                alert("เกิดข้อผิดพลาด: " + error.message);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "บันทึกข้อมูลลงทะเบียน";
+            }
+        });
+    </script>
+</body>
+</html>

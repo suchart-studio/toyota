@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ส่วนผู้ดูแลระบบ - Toyota Kaennakhorn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>body { font-family: 'Kanit', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <nav class="bg-gray-800 text-white px-8 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-3">
+            <span class="text-red-500 text-2xl font-bold"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</span>
+            <span class="text-gray-400">| ศูนย์โตโยต้าแก่นนคร</span>
+        </div>
+        <a href="index.html" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl transition text-sm"><i class="fa-solid fa-home mr-1"></i> กลับหน้าหลัก</a>
+    </nav>
+
+    <main class="flex-1 p-8 max-w-7xl w-full mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">รายการคิวลงทะเบียนนำรถเข้าศูนย์</h1>
+                <p class="text-gray-500">จัดการข้อมูล ตรวจเช็คสถานะรถ และดาวน์โหลดรายงานสรุปประจำวัน</p>
+            </div>
+            <button id="btnPrintPdf" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl shadow transition flex items-center gap-2 text-lg">
+                <i class="fa-solid fa-file-pdf"></i> ออกรายงานคิว (PDF)
+            </button>
+        </div>
+
+        <div id="pdfContent" class="bg-white rounded-2xl shadow overflow-hidden border border-gray-200 p-4">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
+                        <th class="p-4">รูปถ่าย</th>
+                        <th class="p-4">ชื่อ - นามสกุล</th>
+                        <th class="p-4">เบอร์โทร</th>
+                        <th class="p-4">รุ่นรถ / สีรถ</th>
+                        <th class="p-4">ทะเบียนรถ</th>
+                        <th class="p-4">วันที่นัดหมาย</th>
+                        <th class="p-4 text-center">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="text-gray-600 divide-y divide-gray-100">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMptdLpLEdbeVFKZj82M0gyoV2m_2y5Pk",
+            authDomain: "suchartstudio-9a78d.firebaseapp.com",
+            databaseURL: "https://suchartstudio-9a78d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "suchartstudio-9a78d",
+            storageBucket: "suchartstudio-9a78d.firebasestorage.app",
+            messagingSenderId: "953369646185",
+            appId: "1:953369646185:web:6c5994b4563695956ebef8",
+            measurementId: "G-0KV9KLSKVW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const tableBody = document.getElementById('tableBody');
+
+        // โหลดข้อมูลแบบ Realtime จากฐานข้อมูล Firebase
+        onValue(ref(db, 'registrations'), (snapshot) => {
+            tableBody.innerHTML = "";
+            const data = snapshot.val();
+            if (!data) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 text-lg">ยังไม่มีข้อมูลการลงทะเบียนในระบบคิว</td></tr>`;
+                return;
+            }
+
+            Object.keys(data).forEach((id) => {
+                const item = data[id];
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <img src="${item.photoUrl || 'https://placehold.co/50x50/emerald/ffffff?text=User'}" class="w-12 h-12 object-cover rounded-full border border-gray-300">
+                    </td>
+                    <td class="p-4 font-semibold text-gray-800">${item.fullname}</td>
+                    <td class="p-4">${item.phone}</td>
+                    <td class="p-4"><span class="bg-gray-100 px-3 py-1 rounded-full text-sm font-medium">${item.carModel} / ${item.carColor}</span></td>
+                    <td class="p-4 font-bold text-red-600 tracking-wide">${item.licensePlate}</td>
+                    <td class="p-4">${item.serviceDate}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="editRecord('${id}', '${item.fullname}', '${item.phone}')" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                        <button onclick="deleteRecord('${id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600"><i class="fa-solid fa-trash"></i> ลบ</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        });
+
+        // ฟังก์ชันลบข้อมูลคิว
+        window.deleteRecord = function(id) {
+            if(confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการคิวลงทะเบียนนี้?")) {
+                remove(ref(db, `registrations/${id}`))
+                    .then(() => alert("ลบข้อมูลคิวสำเร็จ"))
+                    .catch(err => alert("ผิดพลาด: " + err.message));
+            }
+        }
+
+        // ฟังก์ชันแก้ไขข้อมูลเบื้องต้นอย่างรวดเร็ว (ชื่อและเบอร์โทร)
+        window.editRecord = function(id, currentName, currentPhone) {
+            const newName = prompt("แก้ไขชื่อ - นามสกุล:", currentName);
+            const newPhone = prompt("แก้ไขเบอร์โทรศัพท์:", currentPhone);
+            
+            if(newName !== null && newPhone !== null) {
+                update(ref(db, `registrations/${id}`), {
+                    fullname: newName,
+                    phone: newPhone
+                }).then(() => alert("ปรับปรุงข้อมูลเรียบร้อยแล้ว"))
+                  .catch(err => alert("ผิดพลาด: " + err.message));
+            }
+        }
+
+        // ระบบส่งออกรายงานเป็นเอกสารไฟล์ PDF ด้วย html2pdf
+        document.getElementById('btnPrintPdf').addEventListener('click', () => {
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin:       10,
+                filename:     'Toyota-Kaennakhorn-Report-' + new Date().toISOString().slice(0,10) + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            html2pdf().set(opt).from(element).save();
+        });
+    </script>
+</body>
+</html>
