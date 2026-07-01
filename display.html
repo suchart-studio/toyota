@@ -7,18 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #0d1117; }
         .neon-border-green { box-shadow: 0 0 30px #10b981, inset 0 0 15px #10b981; }
         .neon-border-red { box-shadow: 0 0 30px #ef4444, inset 0 0 15px #ef4444; }
-        #reader { width: 100% !important; border: none !important; }
-        #reader video { width: 100% !important; border-radius: 20px; object-fit: contain !important; }
+        .neon-text-blue { text-shadow: 0 0 10px #3b82f6; }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden flex flex-col p-8 text-white select-none">
     
-    <!-- ส่วนหัวทีวี -->
     <div class="flex justify-between items-center border-b-4 border-red-600 pb-4 mb-6 shrink-0">
         <div class="flex items-center gap-6">
             <div class="bg-red-600 p-4 rounded-2xl text-4xl"><i class="fa-solid fa-car-side"></i></div>
@@ -27,37 +24,40 @@
         <div id="liveClock" class="text-4xl font-mono text-gray-400">00:00:00</div>
     </div>
 
-    <!-- บอร์ดแสดงผลแบบแนวนอน แบ่ง 2 ฝั่ง ซ้าย-ขวา -->
     <div class="grid grid-cols-2 gap-8 flex-1 min-h-0">
         
-        <!-- ซ้าย: กล่องสแกนเนอร์จับภาพ QR Code -->
-        <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 p-4 shadow-2xl flex flex-col justify-between overflow-hidden">
-            <div class="absolute top-6 left-6 z-10 bg-emerald-600 text-white text-base px-4 py-1.5 rounded-full font-bold uppercase shadow-lg">
-                <i class="fa-solid fa-qrcode mr-2 animate-pulse text-white"></i> QR Scanner Live
+        <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 p-8 shadow-2xl flex flex-col justify-between overflow-hidden">
+            <div class="absolute top-6 left-6 z-10 bg-blue-600 text-white text-base px-4 py-1.5 rounded-full font-bold uppercase shadow-lg">
+                <i class="fa-solid fa-hardware-id Card mr-2"></i> QR Scanner Status
             </div>
             
-            <div class="flex-1 flex items-center justify-center min-h-0">
-                <div id="reader"></div>
+            <div class="flex-1 flex flex-col items-center justify-center space-y-6">
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute w-48 h-48 bg-blue-500/10 rounded-full animate-ping"></div>
+                    <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center border-4 border-blue-500 shadow-xl">
+                        <i class="fa-solid fa-laser-cutter text-6xl text-blue-400 animate-pulse"></i>
+                    </div>
+                </div>
+                <div class="text-center space-y-2">
+                    <h3 class="text-3xl font-bold text-blue-400 neon-text-blue">เครื่องสแกนพร้อมทำงาน</h3>
+                    <p class="text-gray-400 text-lg">โปรดนำ QR Code บนมือถือจ่อที่เครื่องอ่านการ์ด</p>
+                </div>
             </div>
 
-            <!-- แผงทดสอบพิมพ์แมนนวล -->
             <div class="mt-4 bg-black/50 p-3 rounded-2xl flex gap-3 items-center z-10 shrink-0">
-                <input type="text" id="manualIdInput" placeholder="วางหรือพิมพ์คีย์คิวทดสอบที่นี่..." class="flex-1 bg-gray-800 text-white text-base px-4 py-2.5 rounded-xl focus:outline-none border border-gray-600 font-mono">
+                <input type="text" id="manualIdInput" placeholder="พิมพ์คีย์คิวตรงนี้หากเครื่องสแกนมีปัญหา..." class="flex-1 bg-gray-800 text-white text-base px-4 py-2.5 rounded-xl focus:outline-none border border-gray-600 font-mono">
                 <button id="btnManualCheck" class="bg-blue-500 hover:bg-blue-600 px-5 py-2.5 rounded-xl text-base font-bold transition shrink-0">เช็คอินคิว</button>
             </div>
         </div>
 
-        <!-- ขวา: บอร์ดต้อนรับลูกค้าอักษรยักษ์ -->
         <div id="welcomeBox" class="w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300 relative overflow-hidden">
             
-            <!-- หน้าเริ่มต้น: รอต้อนรับ -->
             <div id="welcomeDefault" class="space-y-6">
                 <i class="fa-solid fa-expand text-[120px] text-gray-600 animate-pulse"></i>
                 <h2 class="text-4xl font-bold text-gray-400">กรุณาแสดง QR Code บัตรคิว</h2>
-                <p class="text-xl text-gray-500">จ่อหน้าจอโทรศัพท์มือถือเข้าหาตัวกล้องรับรถด้านหน้า</p>
+                <p class="text-xl text-gray-500">ระบบจะทำการเรียกข้อมูลและบันทึกเวลาเข้าบริการโดยอัตโนมัติ</p>
             </div>
 
-            <!-- หน้าใช้งาน: เมื่อตรวจพบและสแกนคิวผ่าน -->
             <div id="welcomeActive" class="hidden w-full space-y-6 flex flex-col items-center justify-center h-full">
                 <h2 class="text-6xl font-black text-emerald-400 drop-shadow-lg tracking-wide uppercase">ยินดีต้อนรับ</h2>
                 
@@ -83,7 +83,6 @@
 
     </div>
 
-    <!-- ส่วนท้าย -->
     <div class="text-center text-xl text-gray-500 font-light border-t border-gray-800 pt-3 mt-6 shrink-0">
          ศูนย์บริการ โตโยต้าขอนแก่น ยินดีให้บริการด้วยใจจริง
     </div>
@@ -108,10 +107,12 @@
         
         let isProcessing = false; 
 
+        // นาฬิกาบอกเวลา
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('th-TH');
         }, 1000);
 
+        // ฟังก์ชันประมวลผลเช็คอิน
         function processCheckIn(queueId) {
             if (isProcessing) return; 
             isProcessing = true;
@@ -120,10 +121,10 @@
             const welcomeActive = document.getElementById('welcomeActive');
             const welcomeBox = document.getElementById('welcomeBox');
 
-            // 1. อัปเดตสถานะใน Firebase ไปเป็น 'checked-in' เพื่อส่งสัญญาณปลดล็อกให้จอมือถือลูกค้าทันที
+            console.log("ฮาร์ดแวร์ตรวจพบรหัสคิว:", queueId);
+
             update(ref(db, `registrations/${queueId}`), { status: 'checked-in' })
             .then(() => {
-                // 2. ดึงข้อมูลขึ้นทีวีต้อนรับตามปกติ
                 return get(ref(db, `registrations/${queueId}`));
             })
             .then((snapshot) => {
@@ -150,7 +151,7 @@
                     showErrorState("ไม่พบข้อมูลคิวนี้ในระบบ");
                 }
             }).catch((err) => {
-                showErrorState("เกิดข้อผิดพลาดหลังบ้าน");
+                showErrorState("เกิดข้อผิดพลาดในระบบฐานข้อมูล");
                 isProcessing = false;
             });
         }
@@ -174,19 +175,56 @@
             }, 4000);
         }
 
-        const html5QrCode = new Html5QrCode("reader");
-        html5QrCode.start(
-            { facingMode: "user" }, 
-            { fps: 15 }, 
-            (decodedText) => { processCheckIn(decodedText); },
-            () => {}
-        ).catch(err => console.error("สตาร์ทระบบกล้องล้มเหลว:", err));
+        // ==========================================
+        // 🛠️ โค้ดส่วนดักฟังเครื่องสแกนคิวอาร์โค้ด (ฮาร์ดแวร์)
+        // ==========================================
+        let scanBuffer = "";
+        let scanTimeout;
 
+        window.addEventListener('keydown', (e) => {
+            // หากเจ้าหน้าที่กำลังคลิกและพิมพ์ในกล่องพิมพ์ Manual ให้ยกเลิกการดักฟังส่วนนี้ไปก่อน
+            if (document.activeElement.tagName === 'INPUT') return;
+
+            clearTimeout(scanTimeout);
+
+            // เมื่อเครื่องสแกนส่งสัญญาณกด 'Enter' หมายความว่าสแกนโค้ดเสร็จสิ้น
+            if (e.key === 'Enter') {
+                if (scanBuffer.trim().length > 0) {
+                    processCheckIn(scanBuffer.trim());
+                    scanBuffer = ""; // ล้างบัฟเฟอร์เพื่อรอยิงคิวถัดไป
+                }
+                return;
+            }
+
+            // เก็บสะสมตัวอักษรที่เครื่องสแกนเนอร์ "รัวพิมพ์" เข้ามาลงในบัฟเฟอร์
+            if (e.key.length === 1) {
+                scanBuffer += e.key;
+            }
+
+            // ตัวป้องกัน (Safety Net): ถ้าความเร็วในการพิมพ์ช้าเกินไป (เช่น คนแอบกดแป้นพิมพ์เล่น) จะเคลียร์ทิ้งใน 200ms
+            // เพราะเครื่องสแกนเนอร์จะส่งข้อความยาวๆ เสร็จในเวลาเพียงไม่กี่มิลลิวินาทีเท่านั้น
+            scanTimeout = setTimeout(() => {
+                scanBuffer = "";
+            }, 200);
+        });
+
+        // ดักฟังการพิมพ์ตรวจแบบ Manual จากปุ่มกดด้านล่าง
         document.getElementById('btnManualCheck').addEventListener('click', () => {
             const inputVal = document.getElementById('manualIdInput').value.trim();
             if(inputVal) {
                 processCheckIn(inputVal);
                 document.getElementById('manualIdInput').value = "";
+            }
+        });
+
+        // ดักฟังการกด Enter ในช่องอินพุตแมนนวล
+        document.getElementById('manualIdInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const inputVal = document.getElementById('manualIdInput').value.trim();
+                if(inputVal) {
+                    processCheckIn(inputVal);
+                    document.getElementById('manualIdInput').value = "";
+                }
             }
         });
     </script>
