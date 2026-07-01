@@ -80,16 +80,17 @@
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
         // คอนฟิกใหม่ของคุณ
-        const firebaseConfig = {
-            apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
-            authDomain: "toyota-c8d4c.firebaseapp.com",
-            projectId: "toyota-c8d4c",
-            storageBucket: "toyota-c8d4c.firebasestorage.app",
-            messagingSenderId: "201981813251",
-            appId: "1:201981813251:web:409045386613d5ad9e2436",
-            measurementId: "G-W7FE21X5V2"
-        };
-
+const firebaseConfig = {
+  apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
+  authDomain: "toyota-c8d4c.firebaseapp.com",
+  // เพิ่มบรรทัดนี้เข้าไปเพื่อให้วิ่งไปหาเซิร์ฟเวอร์สิงคโปร์ที่ถูกต้อง
+  databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app", 
+  projectId: "toyota-c8d4c",
+  storageBucket: "toyota-c8d4c.firebasestorage.app",
+  messagingSenderId: "201981813251",
+  appId: "1:201981813251:web:409045386613d5ad9e2436",
+  measurementId: "G-W7FE21X5V2"
+};
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let registeredCars = [];
