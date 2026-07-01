@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- เชื่อมต่อ PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ef4444">
     <style>body { font-family: 'Kanit', sans-serif; }</style>
@@ -15,38 +14,21 @@
 <body class="bg-gray-50 flex flex-col justify-between min-h-screen">
 
     <div class="flex-1 flex flex-col items-center justify-center p-6">
-        <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 p-8 text-center">
+        <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 p-8 text-center flex flex-col items-center">
             
-            <!-- Logo / Brand -->
-            <div class="inline-flex items-center justify-center w-24 h-24 bg-red-50 text-red-600 rounded-full text-5xl mb-4 shadow-inner">
-                <i class="fa-solid fa-car-side"></i>
-            </div>
-            <h1 class="text-3xl font-black text-gray-800 tracking-wide">โตโยต้าขอนแก่น</h1>
-            <p class="text-gray-500 mt-2 text-base">ระบบลงทะเบียนและเช็คอินคิวอัจฉริยะ</p>
+            <img src="logo.png" alt="Toyota Logo" class="w-32 h-auto mb-6 drop-shadow-md">
+            
+            <h1 class="text-2xl font-black text-gray-800 tracking-wide mb-2">โตโยต้าขอนแก่น</h1>
+            <p class="text-gray-500 mb-8 text-sm">ระบบลงทะเบียนและเช็คอินคิวอัจฉริยะ</p>
 
-            <div class="mt-8 space-y-4">
-                <!-- ปุ่มสําหรับลูกค้า -->
-                <a href="user.html" class="flex items-center justify-between w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-clipboard-list text-xl"></i> ลงทะเบียนเข้าบริการ</span>
-                    <i class="fa-solid fa-chevron-right text-sm opacity-70"></i>
-                </a>
-
-                <!-- ปุ่มสําหรับหน้าจอทีวี -->
-                <a href="display.html" class="flex items-center justify-between w-full bg-gray-900 hover:bg-black text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-lg transition-all transform hover:-translate-y-0.5">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-tv text-xl text-red-500"></i> เปิดหน้าจอ TV แนวนอน</span>
-                    <i class="fa-solid fa-chevron-right text-sm opacity-70"></i>
-                </a>
-
-                <!-- ปุ่มสําหรับเจ้าหน้าที่ -->
-                <a href="admin.html" class="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl text-sm transition-all">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-user-gear"></i> ส่วนผู้ดูแลระบบ (Admin)</span>
-                    <i class="fa-solid fa-arrow-right text-xs opacity-50"></i>
+            <div class="w-full">
+                <a href="user.html" class="flex items-center justify-center w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-5 px-6 rounded-2xl text-xl shadow-lg shadow-emerald-500/30 transition-all transform hover:-translate-y-1">
+                    <i class="fa-solid fa-clipboard-list mr-3 text-2xl"></i> ลงทะเบียนเข้ารับบริการ
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- แถบแจ้งเตือนให้ติดตั้ง PWA App -->
     <div id="pwaBanner" class="hidden bg-red-600 text-white p-4 fixed bottom-0 left-0 right-0 flex justify-between items-center z-50 shadow-2xl transition-all duration-300">
         <div class="flex items-center gap-3">
             <i class="fa-solid fa-download text-2xl animate-bounce"></i>
@@ -76,7 +58,7 @@
                 .catch(err => console.error('Service Worker Register Failed', err));
         }
 
-        // 3. จัดการระบบป๊อปอัพแจ้งเตือนการติดตั้ง PWA (ก่อนติดตั้ง)
+        // 3. จัดการระบบป๊อปอัพแจ้งเตือนการติดตั้ง PWA
         let deferredPrompt;
         const pwaBanner = document.getElementById('pwaBanner');
         const btnInstallPWA = document.getElementById('btnInstallPWA');
