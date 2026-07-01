@@ -10,7 +10,6 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>body { font-family: 'Kanit', sans-serif; }</style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -57,23 +56,21 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
         import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
+        // คอนฟิกใหม่ของคุณ
         const firebaseConfig = {
-            apiKey: "AIzaSyDMptdLpLEdbeVFKZj82M0gyoV2m_2y5Pk",
-            authDomain: "suchartstudio-9a78d.firebaseapp.com",
-            databaseURL: "https://suchartstudio-9a78d-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "suchartstudio-9a78d",
-            storageBucket: "suchartstudio-9a78d.firebasestorage.app",
-            messagingSenderId: "953369646185",
-            appId: "1:953369646185:web:6c5994b4563695956ebef8",
-            measurementId: "G-0KV9KLSKVW"
+            apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
+            authDomain: "toyota-c8d4c.firebaseapp.com",
+            projectId: "toyota-c8d4c",
+            storageBucket: "toyota-c8d4c.firebasestorage.app",
+            messagingSenderId: "201981813251",
+            appId: "1:201981813251:web:409045386613d5ad9e2436",
+            measurementId: "G-W7FE21X5V2"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
         const tableBody = document.getElementById('tableBody');
 
-        // โหลดข้อมูลแบบ Realtime จากฐานข้อมูล Firebase
         onValue(ref(db, 'registrations'), (snapshot) => {
             tableBody.innerHTML = "";
             const data = snapshot.val();
@@ -104,7 +101,6 @@
             });
         });
 
-        // ฟังก์ชันลบข้อมูลคิว
         window.deleteRecord = function(id) {
             if(confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการคิวลงทะเบียนนี้?")) {
                 remove(ref(db, `registrations/${id}`))
@@ -113,7 +109,6 @@
             }
         }
 
-        // ฟังก์ชันแก้ไขข้อมูลเบื้องต้นอย่างรวดเร็ว (ชื่อและเบอร์โทร)
         window.editRecord = function(id, currentName, currentPhone) {
             const newName = prompt("แก้ไขชื่อ - นามสกุล:", currentName);
             const newPhone = prompt("แก้ไขเบอร์โทรศัพท์:", currentPhone);
@@ -127,12 +122,11 @@
             }
         }
 
-        // ระบบส่งออกรายงานเป็นเอกสารไฟล์ PDF ด้วย html2pdf
         document.getElementById('btnPrintPdf').addEventListener('click', () => {
             const element = document.getElementById('pdfContent');
             const opt = {
                 margin:       10,
-                filename:     'Toyota-Kaennakhorn-Report-' + new Date().toISOString().slice(0,10) + '.pdf',
+                filename:     'Toyota-KhonKaen-Report-' + new Date().toISOString().slice(0,10) + '.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
