@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI License Plate Detection - TV Landscape</title>
+    <title>QR Code Check-in Display - TV Landscape</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #0d1117; }
         .neon-border-green { box-shadow: 0 0 30px #10b981, inset 0 0 15px #10b981; }
         .neon-border-red { box-shadow: 0 0 30px #ef4444, inset 0 0 15px #ef4444; }
+        /* บังคับปรับแต่งวิดีโอของกล่องสแกนเนอร์ให้เต็มพื้นที่ */
+        #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; transform: scaleX(-1); }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden flex flex-col p-8 text-white select-none">
@@ -26,44 +29,39 @@
     <div class="grid grid-cols-2 gap-8 flex-1 min-h-0">
         
         <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 overflow-hidden shadow-2xl flex flex-col">
-            <video id="webcam" class="w-full h-full object-cover scale-x-[-1]" autoplay playsinline></video>
-            <div class="absolute inset-0 border-[16px] border-dashed border-red-500/30 animate-pulse pointer-events-none"></div>
-            <div class="absolute top-6 left-6 bg-red-600 text-white text-xl px-6 py-2 rounded-full font-bold uppercase">
-                <i class="fa-solid fa-record-vinyl mr-2 animate-ping text-white"></i> AI Scanner Live
-            </div>
-            
-            <div class="absolute bottom-6 left-6 right-6 bg-black/80 p-4 rounded-2xl flex gap-4 items-center">
-                <input type="text" id="mockPlate" placeholder="พิมพ์ป้ายทดสอบ (เช่น กข1234)" class="flex-1 bg-gray-800 text-white text-xl px-4 py-3 rounded-xl focus:outline-none border border-gray-600">
-                <button id="btnScan" class="bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-xl text-xl font-bold transition">ตรวจจับป้าย</button>
+            <div id="reader" class="w-full h-full"></div>
+            <div class="absolute inset-0 border-[14px] border-dashed border-emerald-500/20 pointer-events-none animate-pulse"></div>
+            <div class="absolute top-6 left-6 bg-emerald-600 text-white text-xl px-6 py-2 rounded-full font-bold uppercase shadow-lg">
+                <i class="fa-solid fa-qrcode mr-2 animate-spin text-white"></i> QR Scanner Active
             </div>
         </div>
 
         <div id="welcomeBox" class="w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300 relative overflow-hidden">
             
             <div id="welcomeDefault" class="space-y-6">
-                <i class="fa-solid fa-qrcode text-[120px] text-gray-600 animate-pulse"></i>
-                <h2 class="text-4xl font-bold text-gray-400">กำลังรอตรวจพบแผ่นป้ายทะเบียน...</h2>
-                <p class="text-xl text-gray-500">กรุณาขับรถเข้าประชิดจุดตรวจรับรถด้านหน้า</p>
+                <i class="fa-solid fa-expand text-[120px] text-gray-600 animate-pulse"></i>
+                <h2 class="text-4xl font-bold text-gray-400">กรุณาแสดง QR Code บัตรคิว</h2>
+                <p class="text-xl text-gray-500">จ่อหน้าจอโทรศัพท์มือถือเข้าหาตัวกล้องรับรถด้านหน้า</p>
             </div>
 
-            <div id="welcomeActive" class="hidden w-full space-y-6 animate-fade-in flex flex-col items-center justify-center h-full">
+            <div id="welcomeActive" class="hidden w-full space-y-6 flex flex-col items-center justify-center h-full">
                 <h2 class="text-6xl font-black text-emerald-400 drop-shadow-lg tracking-wide uppercase">ยินดีต้อนรับ</h2>
                 
-                <img id="custPhoto" class="w-64 h-64 object-cover rounded-full border-8 border-emerald-400 shadow-2xl bg-white my-4" src="" alt="Customer">
+                <img id="custPhoto" class="w-64 h-64 object-cover rounded-full border-8 border-emerald-400 shadow-2xl bg-white my-4" src="" alt="Customer Photo">
 
                 <div class="space-y-2">
                     <p class="text-2xl text-gray-300 font-medium">คุณลูกค้าผู้ทรงเกียรติ</p>
-                    <h3 id="custName" class="text-5xl font-bold text-white bg-gradient-to-r from-white to-gray-300 inline-block px-8 py-2 rounded-2xl">คุณ สมชาย ใจดี</h3>
+                    <h3 id="custName" class="text-5xl font-bold text-white bg-gradient-to-r from-white to-gray-300 inline-block px-8 py-2 rounded-2xl">-</h3>
                 </div>
 
                 <div class="w-full grid grid-cols-2 gap-4 mt-6 bg-gray-800/80 p-6 rounded-3xl border-2 border-emerald-500/30">
                     <div class="text-left bg-black/40 p-4 rounded-xl">
                         <span class="text-lg text-emerald-400 block"><i class="fa-solid fa-car"></i> ทะเบียน</span>
-                        <span id="custPlate" class="text-3xl font-bold tracking-wider text-white">กข 1234</span>
+                        <span id="custPlate" class="text-3xl font-bold tracking-wider text-white">-</span>
                     </div>
                     <div class="text-left bg-black/40 p-4 rounded-xl">
                         <span class="text-lg text-emerald-400 block"><i class="fa-solid fa-palette"></i> รุ่นรถ / สี</span>
-                        <span id="custCar" class="text-3xl font-bold text-white">Yaris - สีขาว</span>
+                        <span id="custCar" class="text-3xl font-bold text-white">-</span>
                     </div>
                 </div>
             </div>
@@ -77,92 +75,96 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
-        // คอนฟิกใหม่ของคุณ
-const firebaseConfig = {
-  apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
-  authDomain: "toyota-c8d4c.firebaseapp.com",
-  // เพิ่มบรรทัดนี้เข้าไปเพื่อให้วิ่งไปหาเซิร์ฟเวอร์สิงคโปร์ที่ถูกต้อง
-  databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app", 
-  projectId: "toyota-c8d4c",
-  storageBucket: "toyota-c8d4c.firebasestorage.app",
-  messagingSenderId: "201981813251",
-  appId: "1:201981813251:web:409045386613d5ad9e2436",
-  measurementId: "G-W7FE21X5V2"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
+            authDomain: "toyota-c8d4c.firebaseapp.com",
+            databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "toyota-c8d4c",
+            storageBucket: "toyota-c8d4c.firebasestorage.app",
+            messagingSenderId: "201981813251",
+            appId: "1:201981813251:web:409045386613d5ad9e2436",
+            measurementId: "G-W7FE21X5V2"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let registeredCars = [];
+        
+        let isProcessing = false; // ตัวควบคุมหน่วงเวลา ป้องกันการอ่านซ้ำซ้อนเบิ้ลคิว
 
-        onValue(ref(db, 'registrations'), (snapshot) => {
-            const data = snapshot.val();
-            registeredCars = [];
-            if(data) {
-                Object.keys(data).forEach(key => {
-                    registeredCars.push(data[key]);
-                });
-            }
-        });
-
-        const webcam = document.getElementById('webcam');
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => webcam.srcObject = stream)
-                .catch(err => console.log("Webcam Error: ", err));
-        }
-
+        // นาฬิกามุมขวาบนทีวี
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('th-TH');
         }, 1000);
 
-        function processLicensePlateDetection(scannedText) {
-            const cleanText = scannedText.replace(/\s+/g, '').toUpperCase();
-            const match = registeredCars.find(car => car.licensePlate.toUpperCase() === cleanText);
+        // ฟังก์ชันรับค่าเมื่อกล้องอ่าน QR Code สำเร็จ
+        function onScanSuccess(decodedText) {
+            if (isProcessing) return; 
+            isProcessing = true;
 
             const welcomeDefault = document.getElementById('welcomeDefault');
             const welcomeActive = document.getElementById('welcomeActive');
             const welcomeBox = document.getElementById('welcomeBox');
 
-            if (match) {
-                document.getElementById('custName').innerText = match.fullname;
-                document.getElementById('custPhoto').src = match.photoUrl || "https://placehold.co/150x150/emerald/ffffff?text=User";
-                document.getElementById('custPlate').innerText = match.licensePlate;
-                document.getElementById('custCar').innerText = `${match.carModel} (${match.carColor})`;
-                
-                welcomeDefault.classList.add('hidden');
-                welcomeActive.classList.remove('hidden');
-                welcomeActive.classList.add('flex');
-                welcomeBox.className = "w-full h-full bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+            // ไปดึงข้อมูลจาก ID ที่เจาะจงมาตรงๆ จาก Firebase ได้เลย แม่นยำ 100%
+            get(ref(db, `registrations/${decodedText}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const match = snapshot.val();
+                    
+                    document.getElementById('custName').innerText = match.fullname;
+                    document.getElementById('custPhoto').src = match.photoUrl;
+                    document.getElementById('custPlate').innerText = match.licensePlate;
+                    document.getElementById('custCar').innerText = `${match.carModel} (${match.carColor})`;
+                    
+                    welcomeDefault.classList.add('hidden');
+                    welcomeActive.classList.remove('hidden');
+                    welcomeBox.className = "w-full h-full bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
 
-                setTimeout(() => {
-                    welcomeDefault.classList.remove('hidden');
-                    welcomeActive.classList.add('hidden');
-                    welcomeActive.classList.remove('flex');
-                    welcomeBox.className = "w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
-                }, 8000);
-            } else {
-                welcomeDefault.classList.add('hidden');
-                welcomeActive.classList.add('hidden');
-                welcomeActive.classList.remove('flex');
-                welcomeBox.className = "w-full h-full bg-red-950/90 rounded-3xl border-4 border-red-500 neon-border-red flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
-                
-                welcomeBox.innerHTML = `
-                    <div class="space-y-4 flex flex-col items-center justify-center h-full">
-                        <i class="fa-solid fa-triangle-exclamation text-[100px] text-red-500 animate-bounce"></i>
-                        <h2 class="text-5xl font-black text-white">ไม่พบข้อมูลการลงทะเบียน</h2>
-                        <p class="text-2xl text-red-300 mt-4">ทะเบียน "${scannedText}" ยังไม่ได้จองคิวล่วงหน้า</p>
-                    </div>
-                `;
+                    // แสดงผลค้างไว้ 7 วินาที แล้วรีเซ็ตหน้าจอเพื่อรอคิวถัดไป
+                    setTimeout(() => {
+                        welcomeDefault.classList.remove('hidden');
+                        welcomeActive.classList.add('hidden');
+                        welcomeBox.className = "w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                        isProcessing = false;
+                    }, 7000);
 
-                setTimeout(() => { location.reload(); }, 5000);
-            }
+                } else {
+                    // กรณีเป็น QR Code อื่นแปลกปลอมที่ระบบไม่รู้จัก
+                    showErrorState("QR Code นี้ไม่มีข้อมูลในระบบ");
+                }
+            }).catch((err) => {
+                showErrorState("ระบบขัดข้องกรุณาลองใหม่");
+            });
         }
 
-        document.getElementById('btnScan').addEventListener('click', () => {
-            const val = document.getElementById('mockPlate').value.trim();
-            if(val) processLicensePlateDetection(val);
-        });
+        function showErrorState(msg) {
+            const welcomeBox = document.getElementById('welcomeBox');
+            const originalHTML = welcomeBox.innerHTML;
+            
+            welcomeBox.className = "w-full h-full bg-red-950/90 rounded-3xl border-4 border-red-500 neon-border-red flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+            welcomeBox.innerHTML = `
+                <div class="space-y-4 flex flex-col items-center justify-center h-full">
+                    <i class="fa-solid fa-triangle-exclamation text-[100px] text-red-500 animate-bounce"></i>
+                    <h2 class="text-5xl font-black text-white">เกิดข้อผิดพลาด</h2>
+                    <p class="text-2xl text-red-300 mt-4">${msg}</p>
+                </div>
+            `;
+            setTimeout(() => {
+                welcomeBox.innerHTML = originalHTML;
+                welcomeBox.className = "w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                isProcessing = false;
+            }, 4000);
+        }
+
+        // เริ่มต้นเปิดระบบกล้องเว็บแคมสำหรับสแกน QR Code
+        const html5QrCode = new Html5QrCode("reader");
+        html5QrCode.start(
+            { facingMode: "user" }, 
+            { fps: 15, qrbox: { width: 280, height: 280 } },
+            onScanSuccess,
+            () => { /* เพิกเฉยข้อผิดพลาดการสแกนผ่านลมเพื่อไม่ให้ Log บวม */ }
+        ).catch(err => console.error("ไม่สามารถสตาร์ทกล้องคิวอาร์โค้ดได้", err));
     </script>
 </body>
 </html>
