@@ -4,69 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ลงทะเบียนเข้าตรวจเช็ค - Toyota Khon Kaen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>body { font-family: 'Kanit', sans-serif; }</style>
 </head>
 <body class="bg-gray-100 flex justify-center items-center min-h-screen">
     <div class="w-full max-w-md min-h-screen bg-white shadow-xl flex flex-col p-6 border-t-8 border-emerald-500">
+        
         <div class="flex items-center justify-between mb-6">
             <a href="index.html" class="text-gray-600 text-xl"><i class="fa-solid fa-arrow-left"></i></a>
             <h1 class="text-2xl font-bold text-emerald-700">ลงทะเบียนตรวจเช็ครถ</h1>
             <div></div>
         </div>
 
-        <form id="regForm" class="space-y-4 flex-1 pb-8">
-            <div>
-                <label class="block text-gray-700 font-medium mb-1 text-lg">ภาพถ่ายหน้าตรงลูกค้า</label>
-                <div class="flex flex-col items-center bg-gray-50 p-3 rounded-xl border-2 border-dashed border-gray-300">
-                    <video id="video" class="w-full max-h-48 rounded-lg bg-black hidden" autoplay playsinline></video>
-                    <canvas id="canvas" class="w-full max-h-48 rounded-lg bg-black hidden"></canvas>
-                    <img id="photoPreview" class="w-32 h-32 object-cover rounded-full border-4 border-emerald-500 hidden" src="" alt="Preview">
-                    
-                    <div class="mt-3 flex gap-2">
-                        <button type="button" id="startCam" class="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold"><i class="fa-solid fa-camera mr-1"></i> เปิดกล้อง</button>
-                        <button type="button" id="captureCam" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hidden"><i class="fa-solid fa-circle-dot mr-1"></i> ถ่ายรูป</button>
+        <div id="formContainer">
+            <form id="regForm" class="space-y-4 flex-1 pb-8">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1 text-lg">ภาพถ่ายหน้าตรงลูกค้า</label>
+                    <div class="flex flex-col items-center bg-gray-50 p-3 rounded-xl border-2 border-dashed border-gray-300">
+                        <video id="video" class="w-full max-h-48 rounded-lg bg-black hidden" autoplay playsinline></video>
+                        <canvas id="canvas" class="w-full max-h-48 rounded-lg bg-black hidden"></canvas>
+                        <img id="photoPreview" class="w-32 h-32 object-cover rounded-full border-4 border-emerald-500 hidden" src="" alt="Preview">
+                        
+                        <div class="mt-3 flex gap-2">
+                            <button type="button" id="startCam" class="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold"><i class="fa-solid fa-camera mr-1"></i> เปิดกล้อง</button>
+                            <button type="button" id="captureCam" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hidden"><i class="fa-solid fa-circle-dot mr-1"></i> ถ่ายรูป</button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-gray-700 font-medium text-lg">ชื่อ - นามสกุล</label>
-                <input type="text" id="fullname" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
-            </div>
-
-            <div>
-                <label class="block text-gray-700 font-medium text-lg">เบอร์โทรศัพท์</label>
-                <input type="tel" id="phone" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-gray-700 font-medium text-lg">รุ่นรถยนต์</label>
-                    <input type="text" id="carModel" placeholder="เช่น Yaris, Hilux" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                    <label class="block text-gray-700 font-medium text-lg">ชื่อ - นามสกุล</label>
+                    <input type="text" id="fullname" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
                 </div>
+
                 <div>
-                    <label class="block text-gray-700 font-medium text-lg">สีรถ</label>
-                    <input type="text" id="carColor" placeholder="เช่น ขาว, ดำ" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                    <label class="block text-gray-700 font-medium text-lg">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="phone" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
                 </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-700 font-medium text-lg">รุ่นรถยนต์</label>
+                        <input type="text" id="carModel" placeholder="Yaris, Revo" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium text-lg">สีรถ</label>
+                        <input type="text" id="carColor" placeholder="ขาว, ดำ" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium text-lg">หมายเลขทะเบียนรถ</label>
+                    <input type="text" id="licensePlate" placeholder="กข1234ขอนแก่น" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg font-bold text-gray-800 uppercase focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium text-lg">วันที่เข้ารับบริการ</label>
+                    <input type="date" id="serviceDate" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <button type="submit" id="btnSubmit" class="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl text-xl shadow-lg hover:bg-emerald-600 transition">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> ลงทะเบียนและรับ QR บัตรคิว
+                </button>
+            </form>
+        </div>
+
+        <div id="qrContainer" class="hidden flex-1 flex flex-col items-center justify-center text-center my-auto space-y-6 pb-12">
+            <div class="text-emerald-500 text-6xl animate-bounce"><i class="fa-solid fa-circle-check"></i></div>
+            <h2 class="text-3xl font-bold text-gray-800">ลงทะเบียนสำเร็จ!</h2>
+            <p class="text-gray-500 max-w-xs">กรุณาบันทึกภาพหน้าจอ QR Code นี้ไว้แสดงต่อกล้องเมื่อเดินทางมาถึงศูนย์บริการ</p>
+            
+            <div class="bg-gray-50 border-2 border-gray-200 p-6 rounded-3xl shadow-inner flex flex-col items-center w-full max-w-xs">
+                <span class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider mb-4">Toyota Khon Kaen Queue</span>
+                <img id="qrImage" class="w-48 h-48 border-4 border-white shadow-md bg-white" src="" alt="QR Code Ticket">
+                <p id="ticketName" class="font-bold text-gray-700 text-xl mt-4">-</p>
+                <p id="ticketPlate" class="text-gray-400 font-medium text-sm">-</p>
             </div>
 
-            <div>
-                <label class="block text-gray-700 font-medium text-lg">หมายเลขทะเบียนรถ (ไม่ต้องมีช่องว่าง)</label>
-                <input type="text" id="licensePlate" placeholder="กข1234กรุงเทพ" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg font-bold text-gray-800 uppercase focus:outline-none focus:border-emerald-500">
-            </div>
+            <a href="index.html" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl hover:bg-black transition">กลับหน้าหลัก</a>
+        </div>
 
-            <div>
-                <label class="block text-gray-700 font-medium text-lg">วันที่เข้ารับบริการ</label>
-                <input type="date" id="serviceDate" required class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-emerald-500">
-            </div>
-
-            <button type="submit" id="btnSubmit" class="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl text-xl shadow-lg hover:bg-emerald-600 transition">
-                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> บันทึกข้อมูลลงทะเบียน
-            </button>
-        </form>
     </div>
 
     <script type="module">
@@ -74,18 +93,17 @@
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
         import { getStorage, ref as sRef, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
 
-        // คอนฟิกใหม่ของคุณ
-const firebaseConfig = {
-  apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
-  authDomain: "toyota-c8d4c.firebaseapp.com",
-  // เพิ่มบรรทัดนี้เข้าไปเพื่อให้วิ่งไปหาเซิร์ฟเวอร์สิงคโปร์ที่ถูกต้อง
-  databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app", 
-  projectId: "toyota-c8d4c",
-  storageBucket: "toyota-c8d4c.firebasestorage.app",
-  messagingSenderId: "201981813251",
-  appId: "1:201981813251:web:409045386613d5ad9e2436",
-  measurementId: "G-W7FE21X5V2"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
+            authDomain: "toyota-c8d4c.firebaseapp.com",
+            databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "toyota-c8d4c",
+            storageBucket: "toyota-c8d4c.firebasestorage.app",
+            messagingSenderId: "201981813251",
+            appId: "1:201981813251:web:409045386613d5ad9e2436",
+            measurementId: "G-W7FE21X5V2"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const storage = getStorage(app);
@@ -106,7 +124,7 @@ const firebaseConfig = {
                 startCamBtn.classList.add('hidden');
                 photoPreview.classList.add('hidden');
             } catch (err) {
-                alert("ไม่สามารถเข้าถึงกล้องได้: " + err);
+                alert("เข้าถึงกล้องไม่ได้: " + err);
             }
         });
 
@@ -115,13 +133,11 @@ const firebaseConfig = {
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
             imgDataUrl = canvas.toDataURL('image/jpeg');
-            
             photoPreview.src = imgDataUrl;
             photoPreview.classList.remove('hidden');
             video.classList.add('hidden');
             captureCamBtn.classList.add('hidden');
             startCamBtn.classList.remove('hidden');
-            
             const stream = video.srcObject;
             if (stream) stream.getTracks().forEach(track => track.stop());
         });
@@ -130,11 +146,10 @@ const firebaseConfig = {
             e.preventDefault();
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true;
-            btnSubmit.innerText = "กำลังบันทึกข้อมูล...";
+            btnSubmit.innerText = "กำลังประมวลผลระบบคิว...";
 
             try {
                 let photoUrl = "https://placehold.co/150x150/emerald/ffffff?text=No+Photo";
-                
                 if (imgDataUrl) {
                     const storageRef = sRef(storage, 'customer_photos/' + Date.now() + '.jpg');
                     await uploadString(storageRef, imgDataUrl, 'data_url');
@@ -142,23 +157,34 @@ const firebaseConfig = {
                 }
 
                 const newRef = push(ref(db, 'registrations'));
+                const fullname = document.getElementById('fullname').value;
+                const licensePlate = document.getElementById('licensePlate').value;
+
                 await set(newRef, {
-                    fullname: document.getElementById('fullname').value,
+                    fullname: fullname,
                     phone: document.getElementById('phone').value,
                     carModel: document.getElementById('carModel').value,
                     carColor: document.getElementById('carColor').value,
-                    licensePlate: document.getElementById('licensePlate').value.replace(/\s+/g, ''),
+                    licensePlate: licensePlate,
                     serviceDate: document.getElementById('serviceDate').value,
-                    photoUrl: photoUrl, // ผูกลิงก์รูปถ่ายเข้าฐานข้อมูลแล้ว
+                    photoUrl: photoUrl,
                     timestamp: Date.now()
                 });
 
-                alert("ลงทะเบียนสำเร็จเรียบร้อย!");
-                window.location.href = "index.html";
+                // สร้าง QR Code จาก ID ลิสต์ฐานข้อมูลที่เพิ่งได้มาใหม่
+                const qrId = newRef.key; 
+                document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrId}`;
+                document.getElementById('ticketName').innerText = fullname;
+                document.getElementById('ticketPlate').innerText = "ทะเบียน: " + licensePlate;
+
+                // สลับหน้าจอไปโชว์ QR Code
+                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('qrContainer').classList.remove('hidden');
+
             } catch (error) {
                 alert("เกิดข้อผิดพลาด: " + error.message);
                 btnSubmit.disabled = false;
-                btnSubmit.innerText = "บันทึกข้อมูลลงทะเบียน";
+                btnSubmit.innerText = "ลงทะเบียนและรับ QR บัตรคิว";
             }
         });
     </script>
