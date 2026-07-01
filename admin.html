@@ -7,8 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>body { font-family: 'Kanit', sans-serif; }</style>
 </head>
@@ -25,8 +23,8 @@
     <main class="flex-1 p-8 max-w-7xl w-full mx-auto">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">รายการคิวลงทะเบียนนำรถเข้าศูนย์</h1>
-                <p class="text-gray-500">จัดการข้อมูล ตรวจเช็คสถานะรถ และดาวน์โหลดรายงานสรุปประจำวัน</p>
+                <h1 class="text-3xl font-bold text-gray-800">ตารางคิวลูกค้าเข้าตรวจรับรถ</h1>
+                <p class="text-gray-500">จัดการคิว แก้ไขรายชื่อผู้จองคิวล่วงหน้า หรือพิมพ์รายงานออกเอกสาร</p>
             </div>
             <button id="btnPrintPdf" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl shadow transition flex items-center gap-2 text-lg">
                 <i class="fa-solid fa-file-pdf"></i> ออกรายงานคิว (PDF)
@@ -56,18 +54,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
         import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
-        // คอนฟิกใหม่ของคุณ
-const firebaseConfig = {
-  apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
-  authDomain: "toyota-c8d4c.firebaseapp.com",
-  // เพิ่มบรรทัดนี้เข้าไปเพื่อให้วิ่งไปหาเซิร์ฟเวอร์สิงคโปร์ที่ถูกต้อง
-  databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app", 
-  projectId: "toyota-c8d4c",
-  storageBucket: "toyota-c8d4c.firebasestorage.app",
-  messagingSenderId: "201981813251",
-  appId: "1:201981813251:web:409045386613d5ad9e2436",
-  measurementId: "G-W7FE21X5V2"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
+            authDomain: "toyota-c8d4c.firebaseapp.com",
+            databaseURL: "https://toyota-c8d4c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "toyota-c8d4c",
+            storageBucket: "toyota-c8d4c.firebasestorage.app",
+            messagingSenderId: "201981813251",
+            appId: "1:201981813251:web:409045386613d5ad9e2436",
+            measurementId: "G-W7FE21X5V2"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -77,7 +73,7 @@ const firebaseConfig = {
             tableBody.innerHTML = "";
             const data = snapshot.val();
             if (!data) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 text-lg">ยังไม่มีข้อมูลการลงทะเบียนในระบบคิว</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 text-lg">ยังไม่มีข้อมูลการลงทะเบียนในระบบคิวขณะนี้</td></tr>`;
                 return;
             }
 
@@ -104,23 +100,22 @@ const firebaseConfig = {
         });
 
         window.deleteRecord = function(id) {
-            if(confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการคิวลงทะเบียนนี้?")) {
+            if(confirm("คุณแน่ใจใช่ไหมที่จะลบคิวลูกค้าท่านนี้ออกจากระบบ?")) {
                 remove(ref(db, `registrations/${id}`))
-                    .then(() => alert("ลบข้อมูลคิวสำเร็จ"))
-                    .catch(err => alert("ผิดพลาด: " + err.message));
+                    .then(() => alert("ลบข้อมูลสำเร็จ"))
+                    .catch(err => alert("เกิดข้อผิดพลาด: " + err.message));
             }
         }
 
         window.editRecord = function(id, currentName, currentPhone) {
-            const newName = prompt("แก้ไขชื่อ - นามสกุล:", currentName);
-            const newPhone = prompt("แก้ไขเบอร์โทรศัพท์:", currentPhone);
-            
+            const newName = prompt("แก้ไขชื่อ - นามสกุลลูกค้า:", currentName);
+            const newPhone = prompt("แก้ไขเบอร์ติดต่อกลับ:", currentPhone);
             if(newName !== null && newPhone !== null) {
                 update(ref(db, `registrations/${id}`), {
                     fullname: newName,
                     phone: newPhone
-                }).then(() => alert("ปรับปรุงข้อมูลเรียบร้อยแล้ว"))
-                  .catch(err => alert("ผิดพลาด: " + err.message));
+                }).then(() => alert("บันทึกการแก้ไขเรียบร้อยแล้ว"))
+                  .catch(err => alert("เกิดข้อผิดพลาด: " + err.message));
             }
         }
 
