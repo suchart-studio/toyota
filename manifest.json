@@ -1,0 +1,21 @@
+{
+  "short_name": "ToyotaKK",
+  "name": "Toyota Khon Kaen Smart Queue",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/red/white?text=Toyota",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://placehold.co/512x512/red/white?text=Toyota",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#0d1117",
+  "theme_color": "#ef4444",
+  "display": "standalone",
+  "orientation": "portrait"
+}

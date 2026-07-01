@@ -12,13 +12,13 @@
         body { font-family: 'Kanit', sans-serif; background-color: #0d1117; }
         .neon-border-green { box-shadow: 0 0 30px #10b981, inset 0 0 15px #10b981; }
         .neon-border-red { box-shadow: 0 0 30px #ef4444, inset 0 0 15px #ef4444; }
-        /* สไตล์เคลียร์พื้นที่ให้กล้องสแกนเนอร์ทำงานได้เต็มประสิทธิภาพ ไม่บิดเบี้ยว */
         #reader { width: 100% !important; border: none !important; }
         #reader video { width: 100% !important; border-radius: 20px; object-fit: contain !important; }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden flex flex-col p-8 text-white select-none">
     
+    <!-- ส่วนหัวทีวี -->
     <div class="flex justify-between items-center border-b-4 border-red-600 pb-4 mb-6 shrink-0">
         <div class="flex items-center gap-6">
             <div class="bg-red-600 p-4 rounded-2xl text-4xl"><i class="fa-solid fa-car-side"></i></div>
@@ -27,8 +27,10 @@
         <div id="liveClock" class="text-4xl font-mono text-gray-400">00:00:00</div>
     </div>
 
+    <!-- บอร์ดแสดงผลแบบแนวนอน แบ่ง 2 ฝั่ง ซ้าย-ขวา -->
     <div class="grid grid-cols-2 gap-8 flex-1 min-h-0">
         
+        <!-- ซ้าย: กล่องสแกนเนอร์จับภาพ QR Code -->
         <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 p-4 shadow-2xl flex flex-col justify-between overflow-hidden">
             <div class="absolute top-6 left-6 z-10 bg-emerald-600 text-white text-base px-4 py-1.5 rounded-full font-bold uppercase shadow-lg">
                 <i class="fa-solid fa-qrcode mr-2 animate-pulse text-white"></i> QR Scanner Live
@@ -38,20 +40,24 @@
                 <div id="reader"></div>
             </div>
 
+            <!-- แผงทดสอบพิมพ์แมนนวล -->
             <div class="mt-4 bg-black/50 p-3 rounded-2xl flex gap-3 items-center z-10 shrink-0">
                 <input type="text" id="manualIdInput" placeholder="วางหรือพิมพ์คีย์คิวทดสอบที่นี่..." class="flex-1 bg-gray-800 text-white text-base px-4 py-2.5 rounded-xl focus:outline-none border border-gray-600 font-mono">
                 <button id="btnManualCheck" class="bg-blue-500 hover:bg-blue-600 px-5 py-2.5 rounded-xl text-base font-bold transition shrink-0">เช็คอินคิว</button>
             </div>
         </div>
 
+        <!-- ขวา: บอร์ดต้อนรับลูกค้าอักษรยักษ์ -->
         <div id="welcomeBox" class="w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300 relative overflow-hidden">
             
+            <!-- หน้าเริ่มต้น: รอต้อนรับ -->
             <div id="welcomeDefault" class="space-y-6">
                 <i class="fa-solid fa-expand text-[120px] text-gray-600 animate-pulse"></i>
                 <h2 class="text-4xl font-bold text-gray-400">กรุณาแสดง QR Code บัตรคิว</h2>
                 <p class="text-xl text-gray-500">จ่อหน้าจอโทรศัพท์มือถือเข้าหาตัวกล้องรับรถด้านหน้า</p>
             </div>
 
+            <!-- หน้าใช้งาน: เมื่อตรวจพบและสแกนคิวผ่าน -->
             <div id="welcomeActive" class="hidden w-full space-y-6 flex flex-col items-center justify-center h-full">
                 <h2 class="text-6xl font-black text-emerald-400 drop-shadow-lg tracking-wide uppercase">ยินดีต้อนรับ</h2>
                 
@@ -77,13 +83,14 @@
 
     </div>
 
+    <!-- ส่วนท้าย -->
     <div class="text-center text-xl text-gray-500 font-light border-t border-gray-800 pt-3 mt-6 shrink-0">
          ศูนย์บริการ โตโยต้าขอนแก่น ยินดีให้บริการด้วยใจจริง
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
@@ -101,12 +108,10 @@
         
         let isProcessing = false; 
 
-        // นาฬิกาบอกเวลา
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('th-TH');
         }, 1000);
 
-        // ฟังก์ชันหัวใจหลัก: ประมวลผลเช็คอินจากรหัส ID
         function processCheckIn(queueId) {
             if (isProcessing) return; 
             isProcessing = true;
@@ -115,9 +120,13 @@
             const welcomeActive = document.getElementById('welcomeActive');
             const welcomeBox = document.getElementById('welcomeBox');
 
-            console.log("กำลังตรวจสอบข้อมูลรหัสคิว:", queueId);
-
-            get(ref(db, `registrations/${queueId}`)).then((snapshot) => {
+            // 1. อัปเดตสถานะใน Firebase ไปเป็น 'checked-in' เพื่อส่งสัญญาณปลดล็อกให้จอมือถือลูกค้าทันที
+            update(ref(db, `registrations/${queueId}`), { status: 'checked-in' })
+            .then(() => {
+                // 2. ดึงข้อมูลขึ้นทีวีต้อนรับตามปกติ
+                return get(ref(db, `registrations/${queueId}`));
+            })
+            .then((snapshot) => {
                 if (snapshot.exists()) {
                     const match = snapshot.val();
                     
@@ -130,7 +139,6 @@
                     welcomeActive.classList.remove('hidden');
                     welcomeBox.className = "w-full h-full bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
 
-                    // แสดงผลค้างไว้ 7 วินาที แล้วรีเซ็ตหน้าจอเพื่อรองรับคิวถัดไป
                     setTimeout(() => {
                         welcomeDefault.classList.remove('hidden');
                         welcomeActive.classList.add('hidden');
@@ -142,8 +150,8 @@
                     showErrorState("ไม่พบข้อมูลคิวนี้ในระบบ");
                 }
             }).catch((err) => {
-                showErrorState("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
-                console.error(err);
+                showErrorState("เกิดข้อผิดพลาดหลังบ้าน");
+                isProcessing = false;
             });
         }
 
@@ -166,21 +174,19 @@
             }, 4000);
         }
 
-        // 1. เปิดกล้องสแกนเนอร์สแกนแบบ Full-Frame (เพิกเฉย qrbox)
         const html5QrCode = new Html5QrCode("reader");
         html5QrCode.start(
             { facingMode: "user" }, 
-            { fps: 15 }, // เช็ค 15 เฟรมต่อวินาทีเพื่อความลื่นไหล
+            { fps: 15 }, 
             (decodedText) => { processCheckIn(decodedText); },
-            () => { /* ทำงานเงียบๆ เมื่อไม่เจอคิวอาร์โค้ดในเฟรม */ }
+            () => {}
         ).catch(err => console.error("สตาร์ทระบบกล้องล้มเหลว:", err));
 
-        // 2. ดักฟังปุ่มกดกรณีพิมพ์ตรวจสอบแบบ Manual
         document.getElementById('btnManualCheck').addEventListener('click', () => {
             const inputVal = document.getElementById('manualIdInput').value.trim();
             if(inputVal) {
                 processCheckIn(inputVal);
-                document.getElementById('manualIdInput').value = ""; // เคลียร์ช่องพิมพ์
+                document.getElementById('manualIdInput').value = "";
             }
         });
     </script>
