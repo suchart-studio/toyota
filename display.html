@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI License Plate Detection - TV Portrait</title>
+    <title>AI License Plate Detection - TV Landscape</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,58 +13,57 @@
         .neon-border-red { box-shadow: 0 0 30px #ef4444, inset 0 0 15px #ef4444; }
     </style>
 </head>
-<body class="w-[1080px] h-[1920px] overflow-hidden flex flex-col justify-between p-12 text-white select-none">
+<body class="w-screen h-screen overflow-hidden flex flex-col p-8 text-white select-none">
     
-    <div class="flex justify-between items-center border-b-4 border-red-600 pb-6">
+    <div class="flex justify-between items-center border-b-4 border-red-600 pb-4 mb-6 shrink-0">
         <div class="flex items-center gap-6">
             <div class="bg-red-600 p-4 rounded-2xl text-4xl"><i class="fa-solid fa-car-side"></i></div>
-            <h1 class="text-6xl font-black tracking-wider text-red-500">TOYOTA KAENNAKHORN AI</h1>
+            <h1 class="text-5xl font-black tracking-wider text-red-500">TOYOTA KHON KAEN AI</h1>
         </div>
-        <div id="liveClock" class="text-5xl font-mono text-gray-400">00:00:00</div>
+        <div id="liveClock" class="text-4xl font-mono text-gray-400">00:00:00</div>
     </div>
 
-    <div class="grid grid-cols-1 gap-8 my-auto h-[1500px]">
+    <div class="grid grid-cols-2 gap-8 flex-1 min-h-0">
         
-        <div class="relative w-full h-[650px] bg-gray-900 rounded-3xl border-4 border-gray-700 overflow-hidden shadow-2xl">
+        <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 overflow-hidden shadow-2xl flex flex-col">
             <video id="webcam" class="w-full h-full object-cover scale-x-[-1]" autoplay playsinline></video>
             <div class="absolute inset-0 border-[16px] border-dashed border-red-500/30 animate-pulse pointer-events-none"></div>
-            <div class="absolute top-6 left-6 bg-red-600 text-white text-2xl px-6 py-2 rounded-full font-bold uppercase animate-bounce">
+            <div class="absolute top-6 left-6 bg-red-600 text-white text-xl px-6 py-2 rounded-full font-bold uppercase animate-bounce">
                 <i class="fa-solid fa-record-vinyl mr-2 text-white"></i> AI Scanner Live
             </div>
             
             <div class="absolute bottom-6 left-6 right-6 bg-black/80 p-4 rounded-2xl flex gap-4 items-center">
-                <input type="text" id="mockPlate" placeholder="พิมพ์ป้ายทดสอบเพื่อจำลอง (เช่น กข1234)" class="flex-1 bg-gray-800 text-white text-2xl px-4 py-2 rounded-xl focus:outline-none border border-gray-600">
-                <button id="btnScan" class="bg-emerald-500 hover:bg-emerald-600 px-6 py-2 rounded-xl text-2xl font-bold transition">ตรวจจับป้าย</button>
+                <input type="text" id="mockPlate" placeholder="พิมพ์ป้ายทดสอบ (เช่น กข1234)" class="flex-1 bg-gray-800 text-white text-xl px-4 py-3 rounded-xl focus:outline-none border border-gray-600">
+                <button id="btnScan" class="bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-xl text-xl font-bold transition">ตรวจจับป้าย</button>
             </div>
         </div>
 
-        <div id="welcomeBox" class="w-full h-[750px] bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300">
-            <div id="welcomeDefault" class="space-y-4">
-                <i class="fa-solid fa-qrcode text-[150px] text-gray-600 animate-pulse"></i>
-                <h2 class="text-5xl font-bold text-gray-400">กำลังรอตรวจพบแผ่นป้ายทะเบียน...</h2>
-                <p class="text-2xl text-gray-500">กรุณาขับรถเข้าประชิดจุดตรวจรับรถด้านหน้า</p>
+        <div id="welcomeBox" class="w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300 relative overflow-hidden">
+            
+            <div id="welcomeDefault" class="space-y-6">
+                <i class="fa-solid fa-qrcode text-[120px] text-gray-600 animate-pulse"></i>
+                <h2 class="text-4xl font-bold text-gray-400">กำลังรอตรวจพบแผ่นป้ายทะเบียน...</h2>
+                <p class="text-xl text-gray-500">กรุณาขับรถเข้าประชิดจุดตรวจรับรถด้านหน้า</p>
             </div>
 
-            <div id="welcomeActive" class="hidden w-full space-y-8 animate-fade-in">
-                <h2 class="text-8xl font-black text-emerald-400 drop-shadow-lg tracking-wide uppercase">ยินดีต้อนรับ</h2>
+            <div id="welcomeActive" class="hidden w-full space-y-6 animate-fade-in flex flex-col items-center justify-center h-full">
+                <h2 class="text-6xl font-black text-emerald-400 drop-shadow-lg tracking-wide uppercase">ยินดีต้อนรับ</h2>
                 
-                <div class="flex justify-center my-6">
-                    <img id="custPhoto" class="w-72 h-72 object-cover rounded-full border-8 border-emerald-400 shadow-2xl bg-white" src="" alt="Customer">
-                </div>
+                <img id="custPhoto" class="w-64 h-64 object-cover rounded-full border-8 border-emerald-400 shadow-2xl bg-white my-4" src="" alt="Customer">
 
                 <div class="space-y-2">
-                    <p class="text-3xl text-gray-300 font-medium">คุณลูกค้าผู้ทรงเกียรติ</p>
-                    <h3 id="custName" class="text-7xl font-bold text-white bg-gradient-to-r from-white to-gray-300 inline-block px-8 py-2 rounded-2xl">คุณ สมชาย ใจดี</h3>
+                    <p class="text-2xl text-gray-300 font-medium">คุณลูกค้าผู้ทรงเกียรติ</p>
+                    <h3 id="custName" class="text-5xl font-bold text-white bg-gradient-to-r from-white to-gray-300 inline-block px-8 py-2 rounded-2xl">คุณ สมชาย ใจดี</h3>
                 </div>
 
-                <div class="grid grid-cols-2 gap-6 max-w-4xl mx-auto bg-gray-800/80 p-6 rounded-3xl border-2 border-emerald-500/30">
+                <div class="w-full grid grid-cols-2 gap-4 mt-6 bg-gray-800/80 p-6 rounded-3xl border-2 border-emerald-500/30">
                     <div class="text-left bg-black/40 p-4 rounded-xl">
-                        <span class="text-xl text-emerald-400 block"><i class="fa-solid fa-car"></i> ทะเบียนที่ตรวจจับ</span>
-                        <span id="custPlate" class="text-4xl font-bold tracking-wider text-white">กข 1234</span>
+                        <span class="text-lg text-emerald-400 block"><i class="fa-solid fa-car"></i> ทะเบียน</span>
+                        <span id="custPlate" class="text-3xl font-bold tracking-wider text-white">กข 1234</span>
                     </div>
                     <div class="text-left bg-black/40 p-4 rounded-xl">
-                        <span class="text-xl text-emerald-400 block"><i class="fa-solid fa-palette"></i> ข้อมูลแบรนด์ / สี</span>
-                        <span id="custCar" class="text-4xl font-bold text-white">Yaris - สีขาว</span>
+                        <span class="text-lg text-emerald-400 block"><i class="fa-solid fa-palette"></i> รุ่นรถ / สี</span>
+                        <span id="custCar" class="text-3xl font-bold text-white">Yaris - สีขาว</span>
                     </div>
                 </div>
             </div>
@@ -72,8 +71,8 @@
 
     </div>
 
-    <div class="text-center text-2xl text-gray-500 font-light border-t border-gray-800 pt-4">
-         ศูนย์บริการ โตโยต้าแก่นนคร ยินดีให้บริการด้วยใจจริง
+    <div class="text-center text-xl text-gray-500 font-light border-t border-gray-800 pt-3 mt-6 shrink-0">
+         ศูนย์บริการ โตโยต้าขอนแก่น ยินดีให้บริการด้วยใจจริง
     </div>
 
     <script type="module">
@@ -93,10 +92,8 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
         let registeredCars = [];
 
-        // ดึงข้อมูลทะเบียนรถทั้งหมดมาเก็บไว้ตรวจสอบ Realtime
         onValue(ref(db, 'registrations'), (snapshot) => {
             const data = snapshot.val();
             registeredCars = [];
@@ -107,7 +104,6 @@
             }
         });
 
-        // เปิดกล้องเว็บแคม
         const webcam = document.getElementById('webcam');
         if (navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true })
@@ -115,13 +111,10 @@
                 .catch(err => console.log("Webcam Error: ", err));
         }
 
-        // ระบบจับเวลาบนหน้าจอทีวี
         setInterval(() => {
-            const now = new Date();
-            document.getElementById('liveClock').innerText = now.toLocaleTimeString('th-TH');
+            document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('th-TH');
         }, 1000);
 
-        // ฟังก์ชันเมื่อ AI ทำการตรวจค้นหาทะเบียนที่พบ
         function processLicensePlateDetection(scannedText) {
             const cleanText = scannedText.replace(/\s+/g, '').toUpperCase();
             const match = registeredCars.find(car => car.licensePlate.toUpperCase() === cleanText);
@@ -138,35 +131,33 @@
                 
                 welcomeDefault.classList.add('hidden');
                 welcomeActive.classList.remove('hidden');
-                welcomeBox.className = "w-full h-[750px] bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                welcomeActive.classList.add('flex');
+                welcomeBox.className = "w-full h-full bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
 
-                // เคลียร์หน้าจอหลังจากเปิดโชว์ 8 วินาที
                 setTimeout(() => {
                     welcomeDefault.classList.remove('hidden');
                     welcomeActive.classList.add('hidden');
-                    welcomeBox.className = "w-full h-[750px] bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                    welcomeActive.classList.remove('flex');
+                    welcomeBox.className = "w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
                 }, 8000);
             } else {
-                // กรณีไม่พบป้ายในคิวลงทะเบียนล่วงหน้า
                 welcomeDefault.classList.add('hidden');
                 welcomeActive.classList.add('hidden');
-                welcomeBox.className = "w-full h-[750px] bg-red-950/90 rounded-3xl border-4 border-red-500 neon-border-red flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                welcomeActive.classList.remove('flex');
+                welcomeBox.className = "w-full h-full bg-red-950/90 rounded-3xl border-4 border-red-500 neon-border-red flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
                 
                 welcomeBox.innerHTML = `
-                    <div class="space-y-4 animate-bounce">
-                        <i class="fa-solid fa-triangle-exclamation text-[120px] text-red-500"></i>
-                        <h2 class="text-6xl font-black text-white">ไม่พบข้อมูลการลงทะเบียน</h2>
-                        <p class="text-3xl text-red-300">ทะเบียน "${scannedText}" ยังไม่ได้จองคิวล่วงหน้า กรุณาติดต่อจุดประชาสัมพันธ์</p>
+                    <div class="space-y-4 animate-bounce flex flex-col items-center justify-center h-full">
+                        <i class="fa-solid fa-triangle-exclamation text-[100px] text-red-500"></i>
+                        <h2 class="text-5xl font-black text-white">ไม่พบข้อมูลการลงทะเบียน</h2>
+                        <p class="text-2xl text-red-300 mt-4">ทะเบียน "${scannedText}" ยังไม่ได้จองคิวล่วงหน้า</p>
                     </div>
                 `;
 
-                setTimeout(() => {
-                    location.reload(); // รีเซ็ตสถานะกลับมาพร้อมสแกนใหม่
-                }, 5000);
+                setTimeout(() => { location.reload(); }, 5000);
             }
         }
 
-        // เหตุการณ์กดปุ่มจำลองป้ายทะเบียนจากหน้าจอ
         document.getElementById('btnScan').addEventListener('click', () => {
             const val = document.getElementById('mockPlate').value.trim();
             if(val) processLicensePlateDetection(val);
