@@ -12,8 +12,9 @@
         body { font-family: 'Kanit', sans-serif; background-color: #0d1117; }
         .neon-border-green { box-shadow: 0 0 30px #10b981, inset 0 0 15px #10b981; }
         .neon-border-red { box-shadow: 0 0 30px #ef4444, inset 0 0 15px #ef4444; }
-        /* บังคับปรับแต่งวิดีโอของกล่องสแกนเนอร์ให้เต็มพื้นที่ */
-        #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; transform: scaleX(-1); }
+        /* สไตล์เคลียร์พื้นที่ให้กล้องสแกนเนอร์ทำงานได้เต็มประสิทธิภาพ ไม่บิดเบี้ยว */
+        #reader { width: 100% !important; border: none !important; }
+        #reader video { width: 100% !important; border-radius: 20px; object-fit: contain !important; }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden flex flex-col p-8 text-white select-none">
@@ -28,11 +29,18 @@
 
     <div class="grid grid-cols-2 gap-8 flex-1 min-h-0">
         
-        <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 overflow-hidden shadow-2xl flex flex-col">
-            <div id="reader" class="w-full h-full"></div>
-            <div class="absolute inset-0 border-[14px] border-dashed border-emerald-500/20 pointer-events-none animate-pulse"></div>
-            <div class="absolute top-6 left-6 bg-emerald-600 text-white text-xl px-6 py-2 rounded-full font-bold uppercase shadow-lg">
-                <i class="fa-solid fa-qrcode mr-2 animate-spin text-white"></i> QR Scanner Active
+        <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 p-4 shadow-2xl flex flex-col justify-between overflow-hidden">
+            <div class="absolute top-6 left-6 z-10 bg-emerald-600 text-white text-base px-4 py-1.5 rounded-full font-bold uppercase shadow-lg">
+                <i class="fa-solid fa-qrcode mr-2 animate-pulse text-white"></i> QR Scanner Live
+            </div>
+            
+            <div class="flex-1 flex items-center justify-center min-h-0">
+                <div id="reader"></div>
+            </div>
+
+            <div class="mt-4 bg-black/50 p-3 rounded-2xl flex gap-3 items-center z-10 shrink-0">
+                <input type="text" id="manualIdInput" placeholder="วางหรือพิมพ์คีย์คิวทดสอบที่นี่..." class="flex-1 bg-gray-800 text-white text-base px-4 py-2.5 rounded-xl focus:outline-none border border-gray-600 font-mono">
+                <button id="btnManualCheck" class="bg-blue-500 hover:bg-blue-600 px-5 py-2.5 rounded-xl text-base font-bold transition shrink-0">เช็คอินคิว</button>
             </div>
         </div>
 
@@ -91,15 +99,15 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        let isProcessing = false; // ตัวควบคุมหน่วงเวลา ป้องกันการอ่านซ้ำซ้อนเบิ้ลคิว
+        let isProcessing = false; 
 
-        // นาฬิกามุมขวาบนทีวี
+        // นาฬิกาบอกเวลา
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('th-TH');
         }, 1000);
 
-        // ฟังก์ชันรับค่าเมื่อกล้องอ่าน QR Code สำเร็จ
-        function onScanSuccess(decodedText) {
+        // ฟังก์ชันหัวใจหลัก: ประมวลผลเช็คอินจากรหัส ID
+        function processCheckIn(queueId) {
             if (isProcessing) return; 
             isProcessing = true;
 
@@ -107,8 +115,9 @@
             const welcomeActive = document.getElementById('welcomeActive');
             const welcomeBox = document.getElementById('welcomeBox');
 
-            // ไปดึงข้อมูลจาก ID ที่เจาะจงมาตรงๆ จาก Firebase ได้เลย แม่นยำ 100%
-            get(ref(db, `registrations/${decodedText}`)).then((snapshot) => {
+            console.log("กำลังตรวจสอบข้อมูลรหัสคิว:", queueId);
+
+            get(ref(db, `registrations/${queueId}`)).then((snapshot) => {
                 if (snapshot.exists()) {
                     const match = snapshot.val();
                     
@@ -121,7 +130,7 @@
                     welcomeActive.classList.remove('hidden');
                     welcomeBox.className = "w-full h-full bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
 
-                    // แสดงผลค้างไว้ 7 วินาที แล้วรีเซ็ตหน้าจอเพื่อรอคิวถัดไป
+                    // แสดงผลค้างไว้ 7 วินาที แล้วรีเซ็ตหน้าจอเพื่อรองรับคิวถัดไป
                     setTimeout(() => {
                         welcomeDefault.classList.remove('hidden');
                         welcomeActive.classList.add('hidden');
@@ -130,11 +139,11 @@
                     }, 7000);
 
                 } else {
-                    // กรณีเป็น QR Code อื่นแปลกปลอมที่ระบบไม่รู้จัก
-                    showErrorState("QR Code นี้ไม่มีข้อมูลในระบบ");
+                    showErrorState("ไม่พบข้อมูลคิวนี้ในระบบ");
                 }
             }).catch((err) => {
-                showErrorState("ระบบขัดข้องกรุณาลองใหม่");
+                showErrorState("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+                console.error(err);
             });
         }
 
@@ -146,7 +155,7 @@
             welcomeBox.innerHTML = `
                 <div class="space-y-4 flex flex-col items-center justify-center h-full">
                     <i class="fa-solid fa-triangle-exclamation text-[100px] text-red-500 animate-bounce"></i>
-                    <h2 class="text-5xl font-black text-white">เกิดข้อผิดพลาด</h2>
+                    <h2 class="text-5xl font-black text-white">ตรวจไม่พบข้อมูลคิว</h2>
                     <p class="text-2xl text-red-300 mt-4">${msg}</p>
                 </div>
             `;
@@ -157,14 +166,23 @@
             }, 4000);
         }
 
-        // เริ่มต้นเปิดระบบกล้องเว็บแคมสำหรับสแกน QR Code
+        // 1. เปิดกล้องสแกนเนอร์สแกนแบบ Full-Frame (เพิกเฉย qrbox)
         const html5QrCode = new Html5QrCode("reader");
         html5QrCode.start(
             { facingMode: "user" }, 
-            { fps: 15, qrbox: { width: 280, height: 280 } },
-            onScanSuccess,
-            () => { /* เพิกเฉยข้อผิดพลาดการสแกนผ่านลมเพื่อไม่ให้ Log บวม */ }
-        ).catch(err => console.error("ไม่สามารถสตาร์ทกล้องคิวอาร์โค้ดได้", err));
+            { fps: 15 }, // เช็ค 15 เฟรมต่อวินาทีเพื่อความลื่นไหล
+            (decodedText) => { processCheckIn(decodedText); },
+            () => { /* ทำงานเงียบๆ เมื่อไม่เจอคิวอาร์โค้ดในเฟรม */ }
+        ).catch(err => console.error("สตาร์ทระบบกล้องล้มเหลว:", err));
+
+        // 2. ดักฟังปุ่มกดกรณีพิมพ์ตรวจสอบแบบ Manual
+        document.getElementById('btnManualCheck').addEventListener('click', () => {
+            const inputVal = document.getElementById('manualIdInput').value.trim();
+            if(inputVal) {
+                processCheckIn(inputVal);
+                document.getElementById('manualIdInput').value = ""; // เคลียร์ช่องพิมพ์
+            }
+        });
     </script>
 </body>
 </html>
