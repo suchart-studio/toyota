@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียนเข้าตรวจเช็ค - Toyota</title>
+    <title>ลงทะเบียนเข้าตรวจเช็ค - Toyota Khon Kaen</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -74,22 +74,21 @@
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
         import { getStorage, ref as sRef, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
 
+        // คอนฟิกใหม่ของคุณ
         const firebaseConfig = {
-            apiKey: "AIzaSyDMptdLpLEdbeVFKZj82M0gyoV2m_2y5Pk",
-            authDomain: "suchartstudio-9a78d.firebaseapp.com",
-            databaseURL: "https://suchartstudio-9a78d-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "suchartstudio-9a78d",
-            storageBucket: "suchartstudio-9a78d.firebasestorage.app",
-            messagingSenderId: "953369646185",
-            appId: "1:953369646185:web:6c5994b4563695956ebef8",
-            measurementId: "G-0KV9KLSKVW"
+            apiKey: "AIzaSyAbY0GCjqUEmQ85jayzOIdujgWQubXHjbc",
+            authDomain: "toyota-c8d4c.firebaseapp.com",
+            projectId: "toyota-c8d4c",
+            storageBucket: "toyota-c8d4c.firebasestorage.app",
+            messagingSenderId: "201981813251",
+            appId: "1:201981813251:web:409045386613d5ad9e2436",
+            measurementId: "G-W7FE21X5V2"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const storage = getStorage(app);
 
-        // จัดการกล้องถ่ายรูป
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const photoPreview = document.getElementById('photoPreview');
@@ -122,12 +121,10 @@
             captureCamBtn.classList.add('hidden');
             startCamBtn.classList.remove('hidden');
             
-            // ปิดสตรีมกล้อง
             const stream = video.srcObject;
             if (stream) stream.getTracks().forEach(track => track.stop());
         });
 
-        // ส่งฟอร์มข้อมูลลงทะเบียน
         document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById('btnSubmit');
@@ -151,6 +148,7 @@
                     carColor: document.getElementById('carColor').value,
                     licensePlate: document.getElementById('licensePlate').value.replace(/\s+/g, ''),
                     serviceDate: document.getElementById('serviceDate').value,
+                    photoUrl: photoUrl, // ผูกลิงก์รูปถ่ายเข้าฐานข้อมูลแล้ว
                     timestamp: Date.now()
                 });
 
