@@ -3,89 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Check-in Display - TV Landscape</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>ยินดีต้อนรับ - โตโยต้าขอนแก่น</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #0d1117; }
-        .neon-border-green { box-shadow: 0 0 30px #10b981, inset 0 0 15px #10b981; }
-        .neon-border-red { box-shadow: 0 0 30px #ef4444, inset 0 0 15px #ef4444; }
-        .neon-text-blue { text-shadow: 0 0 10px #3b82f6; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .neon-text-green { color: #10b981; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .neon-text-red { color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        
+        /* Animation สำหรับรูปภาพและข้อความ */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.7); }
+            100% { box-shadow: 0 0 0 50px rgba(16, 185, 129, 0); }
+        }
+        .photo-pulse { animation: pulse-border 2s infinite; }
+
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
-<body class="w-screen h-screen overflow-hidden flex flex-col p-8 text-white select-none">
-    
-    <div class="flex justify-between items-center border-b-4 border-red-600 pb-4 mb-6 shrink-0">
-        <div class="flex items-center gap-6">
-            <div class="bg-red-600 p-4 rounded-2xl text-4xl"><i class="fa-solid fa-car-side"></i></div>
-            <h1 class="text-5xl font-black tracking-wider text-red-500">TOYOTA KHON KAEN AI</h1>
-        </div>
-        <div id="liveClock" class="text-4xl font-mono text-gray-400">00:00:00</div>
-    </div>
+<body class="flex flex-col items-center justify-between py-20 px-10 text-white select-none">
 
-    <div class="grid grid-cols-2 gap-8 flex-1 min-h-0">
+    <header class="text-center shrink-0">
+        <img src="logo.png" alt="Toyota Logo" class="w-48 mx-auto mb-8 drop-shadow-2xl">
+        <h1 class="text-7xl font-black tracking-tight text-white uppercase">
+            โตโยต้าขอนแก่น <span class="text-red-600 italic">ยินดีต้อนรับ</span>
+        </h1>
+        <div class="h-2 w-64 bg-red-600 mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.8)]"></div>
+    </header>
+
+    <main class="flex-1 w-full flex flex-col items-center justify-center">
         
-        <div class="relative w-full h-full bg-gray-900 rounded-3xl border-4 border-gray-700 p-8 shadow-2xl flex flex-col justify-between overflow-hidden">
-            <div class="absolute top-6 left-6 z-10 bg-blue-600 text-white text-base px-4 py-1.5 rounded-full font-bold uppercase shadow-lg">
-                <i class="fa-solid fa-hardware-id Card mr-2"></i> QR Scanner Status
+        <div id="idleState" class="text-center space-y-12">
+            <div class="relative">
+                <div class="absolute inset-0 bg-red-600 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                <i class="fa-solid fa-qrcode text-[250px] text-gray-800 float-anim"></i>
             </div>
-            
-            <div class="flex-1 flex flex-col items-center justify-center space-y-6">
-                <div class="relative flex items-center justify-center">
-                    <div class="absolute w-48 h-48 bg-blue-500/10 rounded-full animate-ping"></div>
-                    <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center border-4 border-blue-500 shadow-xl">
-                        <i class="fa-solid fa-laser-cutter text-6xl text-blue-400 animate-pulse"></i>
-                    </div>
-                </div>
-                <div class="text-center space-y-2">
-                    <h3 class="text-3xl font-bold text-blue-400 neon-text-blue">เครื่องสแกนพร้อมทำงาน</h3>
-                    <p class="text-gray-400 text-lg">โปรดนำ QR Code บนมือถือจ่อที่เครื่องอ่านการ์ด</p>
-                </div>
-            </div>
-
-            <div class="mt-4 bg-black/50 p-3 rounded-2xl flex gap-3 items-center z-10 shrink-0">
-                <input type="text" id="manualIdInput" placeholder="พิมพ์คีย์คิวตรงนี้หากเครื่องสแกนมีปัญหา..." class="flex-1 bg-gray-800 text-white text-base px-4 py-2.5 rounded-xl focus:outline-none border border-gray-600 font-mono">
-                <button id="btnManualCheck" class="bg-blue-500 hover:bg-blue-600 px-5 py-2.5 rounded-xl text-base font-bold transition shrink-0">เช็คอินคิว</button>
+            <div class="space-y-4">
+                <h2 class="text-5xl font-bold text-gray-500">กรุณาสแกน QR Code</h2>
+                <p class="text-3xl text-gray-600">เพื่อเช็คอินเข้ารับบริการ</p>
             </div>
         </div>
 
-        <div id="welcomeBox" class="w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300 relative overflow-hidden">
-            
-            <div id="welcomeDefault" class="space-y-6">
-                <i class="fa-solid fa-expand text-[120px] text-gray-600 animate-pulse"></i>
-                <h2 class="text-4xl font-bold text-gray-400">กรุณาแสดง QR Code บัตรคิว</h2>
-                <p class="text-xl text-gray-500">ระบบจะทำการเรียกข้อมูลและบันทึกเวลาเข้าบริการโดยอัตโนมัติ</p>
+        <div id="activeState" class="hidden w-full flex flex-col items-center space-y-12 fade-in">
+            <div class="relative">
+                <img id="custPhoto" src="" class="w-[500px] h-[500px] object-cover rounded-full border-[15px] border-emerald-500 shadow-2xl photo-pulse bg-white" alt="Customer">
+                <div class="absolute -bottom-5 right-10 bg-emerald-500 text-white p-6 rounded-full text-5xl shadow-lg">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
             </div>
 
-            <div id="welcomeActive" class="hidden w-full space-y-6 flex flex-col items-center justify-center h-full">
-                <h2 class="text-6xl font-black text-emerald-400 drop-shadow-lg tracking-wide uppercase">ยินดีต้อนรับ</h2>
-                
-                <img id="custPhoto" class="w-64 h-64 object-cover rounded-full border-8 border-emerald-400 shadow-2xl bg-white my-4" src="" alt="Customer Photo">
+            <div class="text-center space-y-4">
+                <p class="text-5xl text-emerald-400 font-semibold tracking-widest uppercase">WELCOME VIP CUSTOMER</p>
+                <h2 id="custName" class="text-[120px] font-black leading-none text-white drop-shadow-2xl italic">-</h2>
+            </div>
 
-                <div class="space-y-2">
-                    <p class="text-2xl text-gray-300 font-medium">คุณลูกค้าผู้ทรงเกียรติ</p>
-                    <h3 id="custName" class="text-5xl font-bold text-white bg-gradient-to-r from-white to-gray-300 inline-block px-8 py-2 rounded-2xl">-</h3>
+            <div class="w-full max-w-5xl grid grid-cols-2 gap-10">
+                <div class="bg-white/5 border-2 border-white/10 p-10 rounded-[50px] backdrop-blur-md text-left">
+                    <span class="text-3xl text-emerald-500 block mb-2 font-bold uppercase tracking-tighter">License Plate</span>
+                    <span id="custPlate" class="text-7xl font-black text-white">-</span>
                 </div>
-
-                <div class="w-full grid grid-cols-2 gap-4 mt-6 bg-gray-800/80 p-6 rounded-3xl border-2 border-emerald-500/30">
-                    <div class="text-left bg-black/40 p-4 rounded-xl">
-                        <span class="text-lg text-emerald-400 block"><i class="fa-solid fa-car"></i> ทะเบียน</span>
-                        <span id="custPlate" class="text-3xl font-bold tracking-wider text-white">-</span>
-                    </div>
-                    <div class="text-left bg-black/40 p-4 rounded-xl">
-                        <span class="text-lg text-emerald-400 block"><i class="fa-solid fa-palette"></i> รุ่นรถ / สี</span>
-                        <span id="custCar" class="text-3xl font-bold text-white">-</span>
-                    </div>
+                <div class="bg-white/5 border-2 border-white/10 p-10 rounded-[50px] backdrop-blur-md text-left">
+                    <span class="text-3xl text-emerald-500 block mb-2 font-bold uppercase tracking-tighter">Car Model / Color</span>
+                    <span id="custCar" class="text-6xl font-black text-white">-</span>
                 </div>
             </div>
         </div>
+    </main>
 
-    </div>
+    <footer class="w-full flex justify-between items-end shrink-0">
+        <div class="text-left">
+            <p id="liveClock" class="text-7xl font-mono font-bold text-gray-400 italic">00:00:00</p>
+            <p class="text-2xl text-gray-600 uppercase tracking-widest mt-2">Current Service Time</p>
+        </div>
+        <div class="text-right">
+            <p class="text-3xl font-bold text-red-500 uppercase italic">Your satisfaction is our priority</p>
+            <p class="text-xl text-gray-700">Powered by Toyota Khon Kaen IT System</p>
+        </div>
+    </footer>
 
-    <div class="text-center text-xl text-gray-500 font-light border-t border-gray-800 pt-3 mt-6 shrink-0">
-         ศูนย์บริการ โตโยต้าขอนแก่น ยินดีให้บริการด้วยใจจริง
-    </div>
+    <input type="text" id="hiddenScanner" class="opacity-0 absolute top-0 pointer-events-none">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
@@ -105,127 +122,96 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        let isProcessing = false; 
+        let isProcessing = false;
 
-        // นาฬิกาบอกเวลา
+        // ระบบนาฬิกา
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('th-TH');
         }, 1000);
 
-        // ฟังก์ชันประมวลผลเช็คอิน
+        // ฟังก์ชันยิงกระดาษ (Paper Shoot)
+        function fireConfetti() {
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // ฟังก์ชันประมวลผลการเช็คอิน
         function processCheckIn(queueId) {
-            if (isProcessing) return; 
+            if (isProcessing) return;
             isProcessing = true;
 
-            const welcomeDefault = document.getElementById('welcomeDefault');
-            const welcomeActive = document.getElementById('welcomeActive');
-            const welcomeBox = document.getElementById('welcomeBox');
+            const idleState = document.getElementById('idleState');
+            const activeState = document.getElementById('activeState');
 
-            console.log("ฮาร์ดแวร์ตรวจพบรหัสคิว:", queueId);
-
+            // อัปเดต Firebase เพื่อปลดล็อกมือถือลูกค้า
             update(ref(db, `registrations/${queueId}`), { status: 'checked-in' })
-            .then(() => {
-                return get(ref(db, `registrations/${queueId}`));
-            })
+            .then(() => get(ref(db, `registrations/${queueId}`)))
             .then((snapshot) => {
                 if (snapshot.exists()) {
-                    const match = snapshot.val();
+                    const data = snapshot.val();
                     
-                    document.getElementById('custName').innerText = match.fullname;
-                    document.getElementById('custPhoto').src = match.photoUrl;
-                    document.getElementById('custPlate').innerText = match.licensePlate;
-                    document.getElementById('custCar').innerText = `${match.carModel} (${match.carColor})`;
+                    // แสดงข้อมูล
+                    document.getElementById('custName').innerText = `คุณ ${data.fullname}`;
+                    document.getElementById('custPhoto').src = data.photoUrl;
+                    document.getElementById('custPlate').innerText = data.licensePlate;
+                    document.getElementById('custCar').innerText = `${data.carModel} / ${data.carColor}`;
                     
-                    welcomeDefault.classList.add('hidden');
-                    welcomeActive.classList.remove('hidden');
-                    welcomeBox.className = "w-full h-full bg-emerald-950/90 rounded-3xl border-4 border-emerald-400 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                    // สลับหน้าจอ
+                    idleState.classList.add('hidden');
+                    activeState.classList.remove('hidden');
+                    
+                    // ยิงกระดาษ!
+                    fireConfetti();
 
+                    // รีเซ็ตหน้าจอใน 10 วินาที
                     setTimeout(() => {
-                        welcomeDefault.classList.remove('hidden');
-                        welcomeActive.classList.add('hidden');
-                        welcomeBox.className = "w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
+                        idleState.classList.remove('hidden');
+                        activeState.classList.add('hidden');
                         isProcessing = false;
-                    }, 7000);
+                    }, 10000);
 
                 } else {
-                    showErrorState("ไม่พบข้อมูลคิวนี้ในระบบ");
+                    isProcessing = false;
+                    console.error("Queue ID not found");
                 }
-            }).catch((err) => {
-                showErrorState("เกิดข้อผิดพลาดในระบบฐานข้อมูล");
+            }).catch(err => {
                 isProcessing = false;
+                console.error(err);
             });
         }
 
-        function showErrorState(msg) {
-            const welcomeBox = document.getElementById('welcomeBox');
-            const originalHTML = welcomeBox.innerHTML;
-            
-            welcomeBox.className = "w-full h-full bg-red-950/90 rounded-3xl border-4 border-red-500 neon-border-red flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
-            welcomeBox.innerHTML = `
-                <div class="space-y-4 flex flex-col items-center justify-center h-full">
-                    <i class="fa-solid fa-triangle-exclamation text-[100px] text-red-500 animate-bounce"></i>
-                    <h2 class="text-5xl font-black text-white">ตรวจไม่พบข้อมูลคิว</h2>
-                    <p class="text-2xl text-red-300 mt-4">${msg}</p>
-                </div>
-            `;
-            setTimeout(() => {
-                welcomeBox.innerHTML = originalHTML;
-                welcomeBox.className = "w-full h-full bg-gray-900/90 rounded-3xl border-4 border-emerald-500 neon-border-green flex flex-col items-center justify-center p-8 text-center transition-all duration-300";
-                isProcessing = false;
-            }, 4000);
-        }
-
         // ==========================================
-        // 🛠️ โค้ดส่วนดักฟังเครื่องสแกนคิวอาร์โค้ด (ฮาร์ดแวร์)
+        // 🛠️ ระบบดักฟังเครื่องสแกน (Keyboard Emulation)
         // ==========================================
         let scanBuffer = "";
         let scanTimeout;
 
         window.addEventListener('keydown', (e) => {
-            // หากเจ้าหน้าที่กำลังคลิกและพิมพ์ในกล่องพิมพ์ Manual ให้ยกเลิกการดักฟังส่วนนี้ไปก่อน
-            if (document.activeElement.tagName === 'INPUT') return;
-
             clearTimeout(scanTimeout);
-
-            // เมื่อเครื่องสแกนส่งสัญญาณกด 'Enter' หมายความว่าสแกนโค้ดเสร็จสิ้น
             if (e.key === 'Enter') {
-                if (scanBuffer.trim().length > 0) {
+                if (scanBuffer.trim().length > 5) {
                     processCheckIn(scanBuffer.trim());
-                    scanBuffer = ""; // ล้างบัฟเฟอร์เพื่อรอยิงคิวถัดไป
+                    scanBuffer = "";
                 }
                 return;
             }
-
-            // เก็บสะสมตัวอักษรที่เครื่องสแกนเนอร์ "รัวพิมพ์" เข้ามาลงในบัฟเฟอร์
             if (e.key.length === 1) {
                 scanBuffer += e.key;
             }
-
-            // ตัวป้องกัน (Safety Net): ถ้าความเร็วในการพิมพ์ช้าเกินไป (เช่น คนแอบกดแป้นพิมพ์เล่น) จะเคลียร์ทิ้งใน 200ms
-            // เพราะเครื่องสแกนเนอร์จะส่งข้อความยาวๆ เสร็จในเวลาเพียงไม่กี่มิลลิวินาทีเท่านั้น
-            scanTimeout = setTimeout(() => {
-                scanBuffer = "";
-            }, 200);
-        });
-
-        // ดักฟังการพิมพ์ตรวจแบบ Manual จากปุ่มกดด้านล่าง
-        document.getElementById('btnManualCheck').addEventListener('click', () => {
-            const inputVal = document.getElementById('manualIdInput').value.trim();
-            if(inputVal) {
-                processCheckIn(inputVal);
-                document.getElementById('manualIdInput').value = "";
-            }
-        });
-
-        // ดักฟังการกด Enter ในช่องอินพุตแมนนวล
-        document.getElementById('manualIdInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const inputVal = document.getElementById('manualIdInput').value.trim();
-                if(inputVal) {
-                    processCheckIn(inputVal);
-                    document.getElementById('manualIdInput').value = "";
-                }
-            }
+            scanTimeout = setTimeout(() => { scanBuffer = ""; }, 200);
         });
     </script>
 </body>
